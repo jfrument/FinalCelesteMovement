@@ -66,18 +66,18 @@ public class RippleEffect : MonoBehaviour
     Material material;
     float timer;
     int dropCount;
+    float rippleSize = 10;
 
     void UpdateShaderParameters()
     {
-        var c = GetComponent<Camera>();
 
-        material.SetVector("_Drop1", droplets[0].MakeShaderParameter(c.aspect));
-        material.SetVector("_Drop2", droplets[1].MakeShaderParameter(c.aspect));
-        material.SetVector("_Drop3", droplets[2].MakeShaderParameter(c.aspect));
+        material.SetVector("_Drop1", droplets[0].MakeShaderParameter(rippleSize));
+        material.SetVector("_Drop2", droplets[1].MakeShaderParameter(rippleSize));
+        material.SetVector("_Drop3", droplets[2].MakeShaderParameter(rippleSize));
 
         material.SetColor("_Reflection", reflectionColor);
-        material.SetVector("_Params1", new Vector4(c.aspect, 1, 1 / waveSpeed, 0));
-        material.SetVector("_Params2", new Vector4(1, 1 / c.aspect, refractionStrength, reflectionStrength));
+        material.SetVector("_Params1", new Vector4(rippleSize, 1, 1 / waveSpeed, 0));
+        material.SetVector("_Params2", new Vector4(1, 1 / rippleSize, refractionStrength, reflectionStrength));
     }
 
     void Awake()
