@@ -72,7 +72,7 @@ public class Movement : MonoBehaviour
         }
 
         //wallgrab code
-        if (Input.GetButtonUp("Fire3") || !coll.onWall || !canMove)
+        if (Input.GetButtonUp("Fire3") || !coll.onWall || !canMove || rb.velocity.y >= 0)
         {
             wallGrab = false;
             wallSlide = false;
@@ -240,6 +240,8 @@ public class Movement : MonoBehaviour
 
     private void WallSlide()
     {
+        if (Input.GetKey("space") && rb.velocity.y > 0)
+            return;
         if(coll.wallSide != side)
          anim.Flip(side * -1);
 
