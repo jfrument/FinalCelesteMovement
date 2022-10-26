@@ -72,7 +72,7 @@ public class Movement : MonoBehaviour
         }
 
         //wallgrab code
-        if (Input.GetButtonUp("Fire3") || !coll.onWall || !canMove || rb.velocity.y >= 0)
+        if (Input.GetButtonUp("Fire3") || !coll.onWall || !canMove)
         {
             wallGrab = false;
             wallSlide = false;
