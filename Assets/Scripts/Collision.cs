@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class Collision : MonoBehaviour
 {
-
+    internal float coyoteTime = 0.1f;
     [Header("Layers")]
     public LayerMask groundLayer;
 
@@ -33,7 +33,11 @@ public class Collision : MonoBehaviour
     // Update is called once per frame
     void Update()
     {  
-        onGround = Physics2D.OverlapCircle((Vector2)transform.position + bottomOffset, collisionRadius, groundLayer);
+        if(Physics2D.OverlapCircle((Vector2)transform.position + bottomOffset, collisionRadius, groundLayer))
+            StartCoroutine(coyote(coyoteTime));
+        else
+            onGround = false;
+
         onWall = Physics2D.OverlapCircle((Vector2)transform.position + rightOffset, collisionRadius, groundLayer) 
             || Physics2D.OverlapCircle((Vector2)transform.position + leftOffset, collisionRadius, groundLayer);
 
@@ -52,5 +56,11 @@ public class Collision : MonoBehaviour
         Gizmos.DrawWireSphere((Vector2)transform.position  + bottomOffset, collisionRadius);
         Gizmos.DrawWireSphere((Vector2)transform.position + rightOffset, collisionRadius);
         Gizmos.DrawWireSphere((Vector2)transform.position + leftOffset, collisionRadius);
+    }
+
+    IEnumerator coyote(float x)
+    {
+        yield return new WaitForSeconds(x);
+        onGround = true;
     }
 }
