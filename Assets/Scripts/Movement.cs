@@ -58,9 +58,11 @@ public class Movement : MonoBehaviour
         float yRaw = Input.GetAxisRaw("Vertical");
         Vector2 dir = new Vector2(x, y);
 
+        //walk code
         Walk(dir);
         anim.SetHorizontalMovement(x, y, rb.velocity.y);
 
+        //wallgrab code
         if (coll.onWall && Input.GetButton("Fire3") && canMove)
         {
             if(side != coll.wallSide)
@@ -69,18 +71,21 @@ public class Movement : MonoBehaviour
             wallSlide = false;
         }
 
+        //wallgrab code
         if (Input.GetButtonUp("Fire3") || !coll.onWall || !canMove)
         {
             wallGrab = false;
             wallSlide = false;
         }
 
+        //resetting wall jumps
         if (coll.onGround && !isDashing)
         {
             wallJumped = false;
             GetComponent<BetterJumping>().enabled = true;
         }
         
+        //wallgrab code
         if (wallGrab && !isDashing)
         {
             rb.gravityScale = 0;
@@ -92,10 +97,9 @@ public class Movement : MonoBehaviour
             rb.velocity = new Vector2(rb.velocity.x, y * (speed * speedModifier));
         }
         else
-        {
             rb.gravityScale = 3;
-        }
 
+        //wallgrab code
         if(coll.onWall && !coll.onGround)
         {
             if (x != 0 && !wallGrab)
@@ -105,9 +109,12 @@ public class Movement : MonoBehaviour
             }
         }
 
+        //reset wallgrab code
         if (!coll.onWall || coll.onGround)
             wallSlide = false;
 
+
+        //jump code
         if (Input.GetButtonDown("Jump"))
         {
             anim.SetTrigger("jump");
@@ -118,18 +125,21 @@ public class Movement : MonoBehaviour
                 WallJump();
         }
 
+        //dash code
         if (Input.GetButtonDown("Fire1") && !hasDashed)
         {
             if(xRaw != 0 || yRaw != 0)
                 Dash(xRaw, yRaw);
         }
 
+        //landing code
         if (coll.onGround && !groundTouch)
         {
             GroundTouch();
             groundTouch = true;
         }
 
+        //jump code
         if(!coll.onGround && groundTouch)
         {
             groundTouch = false;
@@ -137,9 +147,11 @@ public class Movement : MonoBehaviour
 
         WallParticle(y);
 
+        //hardcoded solution to a bug
         if (wallGrab || wallSlide || !canMove)
             return;
 
+        //direction facing code
         if(x > 0)
         {
             side = 1;
