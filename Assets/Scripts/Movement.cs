@@ -7,6 +7,7 @@ using DG.Tweening;
 //beans
 public class Movement : MonoBehaviour
 {
+    public Animator squishAnim;
     private Collision coll;
     [HideInInspector]
     public Rigidbody2D rb;
@@ -279,6 +280,7 @@ public class Movement : MonoBehaviour
 
     private void Jump(Vector2 dir, bool wall)
     {
+        squishAnim.Play("SquashStretch");
         slideParticle.transform.parent.localScale = new Vector3(ParticleSide(), 1, 1);
         ParticleSystem particle = wall ? wallJumpParticle : jumpParticle;
 
