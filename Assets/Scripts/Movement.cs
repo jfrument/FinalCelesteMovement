@@ -150,7 +150,7 @@ public class Movement : MonoBehaviour
         WallParticle(y);
 
         //hardcoded solution to a bug
-        if (wallGrab || wallSlide || !canMove)
+        if (wallGrab || wallSlide)
             return;
 
         //direction facing code

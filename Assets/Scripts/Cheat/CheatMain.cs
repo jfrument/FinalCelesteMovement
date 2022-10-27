@@ -24,7 +24,7 @@ public class CheatMain : MonoBehaviour
     {
         if (bottomTriggered && !topTriggered && !coll.onGround)
         {
-            player.transform.Translate(new Vector2(0.01f * movement.side, 0.01f));
+            player.transform.Translate(new Vector2(0.01f * movement.side, 0.005f));
             print("ACK");
         }
     }
