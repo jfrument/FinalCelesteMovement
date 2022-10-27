@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using DG.Tweening;
 
+//beans
 public class Movement : MonoBehaviour
 {
     private Collision coll;
