@@ -32,11 +32,9 @@ public class Collision : MonoBehaviour
 
     // Update is called once per frame
     void Update()
-    {  
-        if(Physics2D.OverlapCircle((Vector2)transform.position + bottomOffset, collisionRadius, groundLayer))
-            StartCoroutine(coyote(coyoteTime));
-        else
-            onGround = false;
+    {
+        checkCoyote();
+        
 
         onWall = Physics2D.OverlapCircle((Vector2)transform.position + rightOffset, collisionRadius, groundLayer) 
             || Physics2D.OverlapCircle((Vector2)transform.position + leftOffset, collisionRadius, groundLayer);
@@ -56,6 +54,18 @@ public class Collision : MonoBehaviour
         Gizmos.DrawWireSphere((Vector2)transform.position  + bottomOffset, collisionRadius);
         Gizmos.DrawWireSphere((Vector2)transform.position + rightOffset, collisionRadius);
         Gizmos.DrawWireSphere((Vector2)transform.position + leftOffset, collisionRadius);
+    }
+
+    void checkCoyote()
+    {
+
+        if (Physics2D.OverlapCircle((Vector2)transform.position + bottomOffset, collisionRadius, groundLayer))
+        {
+            onGround = true;
+            StartCoroutine(coyote(coyoteTime));
+        }
+        else
+            onGround = false;
     }
 
     IEnumerator coyote(float x)
