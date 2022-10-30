@@ -128,10 +128,12 @@ public class Movement : MonoBehaviour
         }
 
         //dash code
-        if (Input.GetButtonDown("Fire1") && !hasDashed)
+        if ((Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.RightArrow) || Input.GetKeyDown(KeyCode.LeftArrow) || Input.GetKeyDown(KeyCode.DownArrow))&& !hasDashed)
         {
-            if(xRaw != 0 || yRaw != 0)
-                Dash(xRaw, yRaw);
+            if (Input.GetKeyDown(KeyCode.LeftArrow)) Dash(-1, 0);
+            else if (Input.GetKeyDown(KeyCode.RightArrow)) Dash(1, 0);
+            else if (Input.GetKeyDown(KeyCode.UpArrow)) Dash(0, 1);
+            else if (Input.GetKeyDown(KeyCode.DownArrow)) Dash(0, -1);
         }
 
         //landing code
