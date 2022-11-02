@@ -168,7 +168,7 @@ public class Movement : MonoBehaviour
         }
 
 
-    }
+    }//end of update
 
     void GroundTouch()
     {
@@ -200,7 +200,7 @@ public class Movement : MonoBehaviour
     {
         FindObjectOfType<GhostTrail>().ShowGhost();
         StartCoroutine(GroundDash());
-        DOVirtual.Float(14, 0, .8f, RigidbodyDrag);
+        DOVirtual.Float(7, 0, .8f, RigidbodyDrag);
 
         dashParticle.Play();
         rb.gravityScale = 0;
