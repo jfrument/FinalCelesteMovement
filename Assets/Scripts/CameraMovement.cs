@@ -7,6 +7,11 @@ public class CameraMovement : MonoBehaviour
     public Transform target;
     public float smoothing;
 
+    //0, 1.63
+    public Vector2 maxPosition;
+    //-1.38, -2.3
+    public Vector2 minPosition;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -20,6 +25,10 @@ public class CameraMovement : MonoBehaviour
             Vector3 targetPosition = new Vector3(target.position.x,
                                                 target.position.y,
                                                 transform.position.z);
+
+            targetPosition.x = Mathf.Clamp(targetPosition.x, minPosition.x, maxPosition.x);
+            targetPosition.y = Mathf.Clamp(targetPosition.y, minPosition.y, maxPosition.y);
+
 
             transform.position = Vector3.Lerp(transform.position, targetPosition, smoothing);
         }
