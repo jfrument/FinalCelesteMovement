@@ -130,8 +130,10 @@ public class Movement : MonoBehaviour
         //dash code
         if (Input.GetButtonDown("Fire1") && !hasDashed)
         {
-            if(xRaw != 0 || yRaw != 0)
+            if (xRaw != 0 || yRaw != 0)
                 Dash(xRaw, yRaw);
+            else
+                Dash(side, 0);
         }
 
         //landing code
