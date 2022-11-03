@@ -17,6 +17,7 @@ public class Collision : MonoBehaviour
     public bool onRightWall;
     public bool onLeftWall;
     public int wallSide;
+    public float playerMoveSpeed;
 
     [Space]
 

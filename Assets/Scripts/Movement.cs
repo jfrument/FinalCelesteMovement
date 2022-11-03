@@ -391,5 +391,9 @@ public class Movement : MonoBehaviour
         }
 
         currentSpeed = Mathf.Clamp(currentSpeed, -speed, speed);
+        if (moveset > 1)
+            anim.playerMoveSpeed = currentSpeed;
+        else
+            anim.playerMoveSpeed = Input.GetAxis("Horizontal");
     }
 }
