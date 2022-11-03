@@ -147,7 +147,6 @@ public class Movement : MonoBehaviour
         //dash code
         if (Input.GetButtonDown("Fire1") && !hasDashed)
         {
-            dashSound.Play();
             if (xRaw != 0 || yRaw != 0)
                 Dash(xRaw, yRaw);
             else if (moveset > 1)
@@ -205,6 +204,7 @@ public class Movement : MonoBehaviour
 
         hasDashed = true;
 
+        dashSound.Play();
         anim.SetTrigger("dash");
 
         rb.velocity = Vector2.zero;
