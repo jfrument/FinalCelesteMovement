@@ -5489,10 +5489,14 @@ MonoBehaviour:
   squishAnim: {fileID: 2095169702}
   rb: {fileID: 0}
   speed: 7
+  currentSpeed: 0
+  accel: 70
   jumpForce: 12
   slideSpeed: 1
   wallJumpLerp: 5
   dashSpeed: 40
+  dashMomentum: 14
+  playerGrav: 3
   canMove: 1
   wallGrab: 0
   wallJumped: 0

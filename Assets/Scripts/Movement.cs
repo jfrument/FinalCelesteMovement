@@ -140,7 +140,8 @@ public class Movement : MonoBehaviour
         //jump code
         if (Input.GetButtonDown("Jump"))
         {
-            jumpSound.Play();
+            if(moveset > 1)
+                jumpSound.Play();
             anim.SetTrigger("jump");
 
             if (coll.onGround)
@@ -209,7 +210,8 @@ public class Movement : MonoBehaviour
 
         hasDashed = true;
 
-        dashSound.Play();
+        if(moveset > 1)
+            dashSound.Play();
         anim.SetTrigger("dash");
 
         rb.velocity = Vector2.zero;
