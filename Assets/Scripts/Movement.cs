@@ -135,6 +135,7 @@ public class Movement : MonoBehaviour
         //jump code
         if (Input.GetButtonDown("Jump"))
         {
+            jumpSound.Play();
             anim.SetTrigger("jump");
 
             if (coll.onGround)
@@ -146,6 +147,7 @@ public class Movement : MonoBehaviour
         //dash code
         if (Input.GetButtonDown("Fire1") && !hasDashed)
         {
+            dashSound.Play();
             if (xRaw != 0 || yRaw != 0)
                 Dash(xRaw, yRaw);
             else if (moveset > 1)
