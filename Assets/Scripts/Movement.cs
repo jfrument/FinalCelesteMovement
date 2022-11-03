@@ -17,7 +17,7 @@ public class Movement : MonoBehaviour
     [Header("Stats")]
     public float speed = 10;
     public float currentSpeed = 0;
-    public float accel = 10000000;
+    public float accel = 70;
 
     public float jumpForce = 50;
     public float slideSpeed = 5;
