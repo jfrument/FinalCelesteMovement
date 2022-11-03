@@ -20,6 +20,8 @@ public class Movement : MonoBehaviour
     public float slideSpeed = 5;
     public float wallJumpLerp = 10;
     public float dashSpeed = 20;
+    public float dashMomentum = 14;
+    public float playerGrav = 3;
 
     [Space]
     [Header("Booleans")]
@@ -35,6 +37,7 @@ public class Movement : MonoBehaviour
     private bool hasDashed;
 
     public int side = 1;
+    internal uint moveset = 1;
 
     [Space]
     [Header("Polish")]
@@ -42,11 +45,6 @@ public class Movement : MonoBehaviour
     public ParticleSystem jumpParticle;
     public ParticleSystem wallJumpParticle;
     public ParticleSystem slideParticle;
-
-    [Space]
-    [Header("Audio")]
-    public AudioSource jumpSound;
-    public AudioSource dashSound;
 
     // Start is called before the first frame update
     void Start()
@@ -85,6 +83,13 @@ public class Movement : MonoBehaviour
             wallSlide = false;
         }
 
+        if (Input.GetKeyDown("1"))
+            updateMoveset(1);
+        if (Input.GetKeyDown("2"))
+            updateMoveset(2);
+        if (Input.GetKeyDown("3"))
+            updateMoveset(3);
+
         //resetting wall jumps
         if (coll.onGround && !isDashing)
         {
@@ -104,7 +109,7 @@ public class Movement : MonoBehaviour
             rb.velocity = new Vector2(rb.velocity.x, y * (speed * speedModifier));
         }
         else
-            rb.gravityScale = 3;
+            rb.gravityScale = playerGrav;
 
         //wallgrab code
         if(coll.onWall && !coll.onGround)
@@ -124,7 +129,6 @@ public class Movement : MonoBehaviour
         //jump code
         if (Input.GetButtonDown("Jump"))
         {
-            jumpSound.Play();
             anim.SetTrigger("jump");
 
             if (coll.onGround)
@@ -136,9 +140,10 @@ public class Movement : MonoBehaviour
         //dash code
         if (Input.GetButtonDown("Fire1") && !hasDashed)
         {
-            dashSound.Play();
-            if(xRaw != 0 || yRaw != 0)
+            if (xRaw != 0 || yRaw != 0)
                 Dash(xRaw, yRaw);
+            else if (moveset > 1)
+                Dash(side, 0);
         }
 
         //landing code
@@ -173,7 +178,7 @@ public class Movement : MonoBehaviour
         }
 
 
-    }
+    }//end of update
 
     void GroundTouch()
     {
@@ -205,7 +210,7 @@ public class Movement : MonoBehaviour
     {
         FindObjectOfType<GhostTrail>().ShowGhost();
         StartCoroutine(GroundDash());
-        DOVirtual.Float(14, 0, .8f, RigidbodyDrag);
+        DOVirtual.Float(dashMomentum, 0, .8f, RigidbodyDrag);
 
         dashParticle.Play();
         rb.gravityScale = 0;
@@ -216,7 +221,7 @@ public class Movement : MonoBehaviour
         yield return new WaitForSeconds(.3f);
 
         dashParticle.Stop();
-        rb.gravityScale = 3;
+        rb.gravityScale = playerGrav;
         GetComponent<BetterJumping>().enabled = true;
         wallJumped = false;
         isDashing = false;
@@ -249,7 +254,7 @@ public class Movement : MonoBehaviour
 
     private void WallSlide()
     {
-        if (Input.GetKey("space") && rb.velocity.y > 0)
+        if (Input.GetKey("space") && rb.velocity.y > 0 && moveset > 1)
             return;
         if(coll.wallSide != side)
          anim.Flip(side * -1);
@@ -287,7 +292,8 @@ public class Movement : MonoBehaviour
 
     private void Jump(Vector2 dir, bool wall)
     {
-        squishAnim.Play("SquashStretch");
+        if(moveset > 1)
+            squishAnim.Play("SquashStretch");
         slideParticle.transform.parent.localScale = new Vector3(ParticleSide(), 1, 1);
         ParticleSystem particle = wall ? wallJumpParticle : jumpParticle;
 
@@ -329,4 +335,23 @@ public class Movement : MonoBehaviour
         int particleSide = coll.onRightWall ? 1 : -1;
         return particleSide;
     }
+
+    private void updateMoveset(uint newMoveset)
+    {
+        moveset = newMoveset;
+        coll.moveset = newMoveset;
+
+        if (moveset > 2)
+        {
+            playerGrav = 2;
+            dashMomentum = 4;
+        }
+        else
+        {
+            playerGrav = 3;
+            dashMomentum = 14;
+        }
+
+    }
+
 }
