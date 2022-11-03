@@ -16,6 +16,9 @@ public class Movement : MonoBehaviour
     [Space]
     [Header("Stats")]
     public float speed = 10;
+    public float currentSpeed = 0;
+    public float accel = 10000000;
+
     public float jumpForce = 50;
     public float slideSpeed = 5;
     public float wallJumpLerp = 10;
@@ -62,6 +65,8 @@ public class Movement : MonoBehaviour
         float xRaw = Input.GetAxisRaw("Horizontal");
         float yRaw = Input.GetAxisRaw("Vertical");
         Vector2 dir = new Vector2(x, y);
+
+        updateSpeed();
 
         //walk code
         Walk(dir);
@@ -280,7 +285,11 @@ public class Movement : MonoBehaviour
         if (wallGrab)
             return;
 
-        if (!wallJumped)
+        if (!wallJumped && moveset > 1)
+        {
+            rb.velocity = new Vector2(currentSpeed, rb.velocity.y);
+        }
+        else if(!wallJumped)
         {
             rb.velocity = new Vector2(dir.x * speed, rb.velocity.y);
         }
@@ -354,4 +363,23 @@ public class Movement : MonoBehaviour
 
     }
 
+    private void updateSpeed()
+    {
+        
+        currentSpeed += accel * Time.deltaTime * Input.GetAxisRaw("Horizontal");
+        if(Input.GetAxisRaw("Horizontal") != Math.Sign(currentSpeed))
+            currentSpeed += accel * Time.deltaTime * Input.GetAxisRaw("Horizontal");
+
+        //if no input, approach zero
+        if (Input.GetAxisRaw("Horizontal") == 0)
+        {
+            int speedSign = Math.Sign(currentSpeed);
+            currentSpeed -= speedSign * accel * Time.deltaTime;
+            if (speedSign != Math.Sign(currentSpeed))
+                currentSpeed = 0;
+
+        }
+
+        currentSpeed = Mathf.Clamp(currentSpeed, -speed, speed);
+    }
 }
