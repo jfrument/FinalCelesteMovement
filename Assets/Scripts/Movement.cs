@@ -46,6 +46,12 @@ public class Movement : MonoBehaviour
     public ParticleSystem wallJumpParticle;
     public ParticleSystem slideParticle;
 
+    [Space]
+    [Header("Audio")]
+    public AudioSource jumpSound;
+    public AudioSource dashSound;
+
+
     // Start is called before the first frame update
     void Start()
     {
@@ -129,6 +135,7 @@ public class Movement : MonoBehaviour
         //jump code
         if (Input.GetButtonDown("Jump"))
         {
+            jumpSound.Play();
             anim.SetTrigger("jump");
 
             if (coll.onGround)
@@ -197,6 +204,7 @@ public class Movement : MonoBehaviour
 
         hasDashed = true;
 
+        dashSound.Play();
         anim.SetTrigger("dash");
 
         rb.velocity = Vector2.zero;
