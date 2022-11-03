@@ -101,6 +101,9 @@ public class Movement : MonoBehaviour
         if (Input.GetKeyDown("3"))
             updateMoveset(3);
 
+        if(Input.GetKeyDown("r"))
+            rb.transform.position = new Vector2(-9, -3);
+
         //resetting wall jumps
         if (coll.onGround && !isDashing)
         {
@@ -140,7 +143,7 @@ public class Movement : MonoBehaviour
         //jump code
         if (Input.GetButtonDown("Jump"))
         {
-            if(moveset > 1)
+            if(moveset > 1 && coll.onGround || moveset > 1 && coll.onWall)
                 jumpSound.Play();
             anim.SetTrigger("jump");
 
