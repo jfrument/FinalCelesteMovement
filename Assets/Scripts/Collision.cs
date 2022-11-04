@@ -77,7 +77,7 @@ public class Collision : MonoBehaviour
             return;
         }
 
-        if (Physics2D.OverlapCircle((Vector2)transform.position + bottomOffset, collisionRadius, groundLayer))
+        else if (Physics2D.OverlapCircle((Vector2)transform.position + bottomOffset, collisionRadius, groundLayer))
         {
             onGround = true;
             
@@ -89,6 +89,6 @@ public class Collision : MonoBehaviour
     IEnumerator coyote(float x)
     {
         yield return new WaitForSeconds(x);
-        onGround = true;
+        onGround = false;
     }
 }
