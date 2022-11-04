@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class Collision : MonoBehaviour
 {
-    internal float coyoteTime = 0.1f;
+    internal float coyoteTime = .1f;
     [Header("Layers")]
     public LayerMask groundLayer;
 
@@ -71,10 +71,10 @@ public class Collision : MonoBehaviour
         if (Physics2D.OverlapCircle((Vector2)transform.position + bottomOffset, collisionRadius, groundLayer))
         {
             onGround = true;
-            StartCoroutine(coyote(coyoteTime));
+            
         }
         else
-            onGround = false;
+            StartCoroutine(coyote(coyoteTime));
     }
 
     IEnumerator coyote(float x)
