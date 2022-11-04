@@ -35,6 +35,7 @@ public class Movement : MonoBehaviour
     private bool hasDashed;
 
     public int side = 1;
+    public String mode = "basic";
 
     [Space]
     [Header("Polish")]
@@ -59,6 +60,12 @@ public class Movement : MonoBehaviour
         float xRaw = Input.GetAxisRaw("Horizontal");
         float yRaw = Input.GetAxisRaw("Vertical");
         Vector2 dir = new Vector2(x, y);
+
+        if (Input.GetKeyDown(KeyCode.E)) {
+            if (mode == "basic") mode = "polished";
+             else if (mode == "polished") mode = "basic";
+        }
+
 
         //walk code
         Walk(dir);
@@ -128,12 +135,19 @@ public class Movement : MonoBehaviour
         }
 
         //dash code
-        if ((Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.RightArrow) || Input.GetKeyDown(KeyCode.LeftArrow) || Input.GetKeyDown(KeyCode.DownArrow))&& !hasDashed)
-        {
-            if (Input.GetKeyDown(KeyCode.LeftArrow)) Dash(-1, 0);
-            else if (Input.GetKeyDown(KeyCode.RightArrow)) Dash(1, 0);
-            else if (Input.GetKeyDown(KeyCode.UpArrow)) Dash(0, 1);
-            else if (Input.GetKeyDown(KeyCode.DownArrow)) Dash(0, -1);
+        if (mode == "polished") {
+            if ((Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.RightArrow) || Input.GetKeyDown(KeyCode.LeftArrow) || Input.GetKeyDown(KeyCode.DownArrow))&& !hasDashed)
+            {
+                if (Input.GetKeyDown(KeyCode.LeftArrow)) Dash(-1, 0);
+                else if (Input.GetKeyDown(KeyCode.RightArrow)) Dash(1, 0);
+                else if (Input.GetKeyDown(KeyCode.UpArrow)) Dash(0, 1);
+                else if (Input.GetKeyDown(KeyCode.DownArrow)) Dash(0, -1);
+            }
+        } else if (mode == "basic") {
+            if (Input.GetButtonDown("Fire1") && !hasDashed) {
+                    if(xRaw != 0 || yRaw != 0)
+                        Dash(xRaw, yRaw);
+                }
         }
 
         //landing code
@@ -200,7 +214,8 @@ public class Movement : MonoBehaviour
     {
         FindObjectOfType<GhostTrail>().ShowGhost();
         StartCoroutine(GroundDash());
-        DOVirtual.Float(14, 0, .8f, RigidbodyDrag);
+        if (mode == "basic") DOVirtual.Float(14, 0, .8f, RigidbodyDrag);
+        else if (mode == "polished") DOVirtual.Float(14, 0, .8f, RigidbodyDrag);
 
         dashParticle.Play();
         rb.gravityScale = 0;

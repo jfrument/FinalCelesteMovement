@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+//using String;
 
 public class Collision : MonoBehaviour
 {
@@ -15,6 +16,7 @@ public class Collision : MonoBehaviour
     public bool onRightWall;
     public bool onLeftWall;
     public int wallSide;
+    public string mode;
 
     [Space]
 
@@ -27,13 +29,19 @@ public class Collision : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        //mode = "basic";
         
     }
 
     // Update is called once per frame
     void Update()
     {
-        checkCoyote();
+        if (Input.GetKeyDown(KeyCode.E)) {
+            //if (mode == "basic") mode = "polished";
+            //else if (mode == "polished") mode = "basic";
+        }
+
+        //if (mode == "polished") checkCoyote();
         
 
         onWall = Physics2D.OverlapCircle((Vector2)transform.position + rightOffset, collisionRadius, groundLayer) 

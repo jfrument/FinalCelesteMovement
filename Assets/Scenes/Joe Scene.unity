@@ -5497,6 +5497,7 @@ MonoBehaviour:
   wallSlide: 0
   isDashing: 0
   side: 1
+  mode: basic
   dashParticle: {fileID: 786101203}
   jumpParticle: {fileID: 708599380}
   wallJumpParticle: {fileID: 423702326}
@@ -5535,6 +5536,7 @@ MonoBehaviour:
   onRightWall: 0
   onLeftWall: 0
   wallSide: 0
+  mode: 
   collisionRadius: 0.1
   bottomOffset: {x: 0, y: -0.79}
   rightOffset: {x: 0.5, y: -0.33}
@@ -15487,7 +15489,7 @@ Camera:
   far clip plane: 1000
   field of view: 60
   orthographic: 1
-  orthographic size: 7
+  orthographic size: 7.0537996
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
@@ -15512,8 +15514,8 @@ Transform:
   m_GameObject: {fileID: 519420028}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: -0.81, y: -0.52, z: -10}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
+  m_LocalScale: {x: 1.3, y: 1.3, z: 1.3}
+  m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 1
