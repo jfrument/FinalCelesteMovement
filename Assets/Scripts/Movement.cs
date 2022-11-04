@@ -241,8 +241,7 @@ public class Movement : MonoBehaviour
     {
         FindObjectOfType<GhostTrail>().ShowGhost();
         StartCoroutine(GroundDash());
-        if (mode == "basic") DOVirtual.Float(14, 0, .8f, RigidbodyDrag);
-        else if (mode == "polished") DOVirtual.Float(14, 0, .8f, RigidbodyDrag);
+        DOVirtual.Float(dashMomentum, 0, .8f, RigidbodyDrag);
 
         dashParticle.Play();
         rb.gravityScale = 0;
