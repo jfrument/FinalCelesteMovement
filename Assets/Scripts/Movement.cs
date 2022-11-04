@@ -16,10 +16,15 @@ public class Movement : MonoBehaviour
     [Space]
     [Header("Stats")]
     public float speed = 10;
+    public float currentSpeed = 0;
+    public float accel = 70;
+
     public float jumpForce = 50;
     public float slideSpeed = 5;
     public float wallJumpLerp = 10;
     public float dashSpeed = 20;
+    public float dashMomentum = 14;
+    public float playerGrav = 3;
 
     [Space]
     [Header("Booleans")]
@@ -36,6 +41,7 @@ public class Movement : MonoBehaviour
 
     public int side = 1;
     public String mode = "basic";
+    internal uint moveset = 1;
 
     [Space]
     [Header("Polish")]
@@ -43,6 +49,12 @@ public class Movement : MonoBehaviour
     public ParticleSystem jumpParticle;
     public ParticleSystem wallJumpParticle;
     public ParticleSystem slideParticle;
+
+    [Space]
+    [Header("Audio")]
+    public AudioSource jumpSound;
+    public AudioSource dashSound;
+
 
     // Start is called before the first frame update
     void Start()
@@ -66,6 +78,7 @@ public class Movement : MonoBehaviour
              else if (mode == "polished") mode = "basic";
         }
 
+        updateSpeed();
 
         //walk code
         Walk(dir);
@@ -87,6 +100,16 @@ public class Movement : MonoBehaviour
             wallSlide = false;
         }
 
+        if (Input.GetKeyDown("1"))
+            updateMoveset(1);
+        if (Input.GetKeyDown("2"))
+            updateMoveset(2);
+        if (Input.GetKeyDown("3"))
+            updateMoveset(3);
+
+        if(Input.GetKeyDown("r"))
+            rb.transform.position = new Vector2(-9, -3);
+
         //resetting wall jumps
         if (coll.onGround && !isDashing)
         {
@@ -106,7 +129,7 @@ public class Movement : MonoBehaviour
             rb.velocity = new Vector2(rb.velocity.x, y * (speed * speedModifier));
         }
         else
-            rb.gravityScale = 3;
+            rb.gravityScale = playerGrav;
 
         //wallgrab code
         if(coll.onWall && !coll.onGround)
@@ -126,6 +149,8 @@ public class Movement : MonoBehaviour
         //jump code
         if (Input.GetButtonDown("Jump"))
         {
+            if(moveset > 1 && coll.onGround || moveset > 1 && coll.onWall)
+                jumpSound.Play();
             anim.SetTrigger("jump");
 
             if (coll.onGround)
@@ -182,7 +207,7 @@ public class Movement : MonoBehaviour
         }
 
 
-    }
+    }//end of update
 
     void GroundTouch()
     {
@@ -201,6 +226,8 @@ public class Movement : MonoBehaviour
 
         hasDashed = true;
 
+        if(moveset > 1)
+            dashSound.Play();
         anim.SetTrigger("dash");
 
         rb.velocity = Vector2.zero;
@@ -226,7 +253,7 @@ public class Movement : MonoBehaviour
         yield return new WaitForSeconds(.3f);
 
         dashParticle.Stop();
-        rb.gravityScale = 3;
+        rb.gravityScale = playerGrav;
         GetComponent<BetterJumping>().enabled = true;
         wallJumped = false;
         isDashing = false;
@@ -259,7 +286,7 @@ public class Movement : MonoBehaviour
 
     private void WallSlide()
     {
-        if (Input.GetKey("space") && rb.velocity.y > 0)
+        if (Input.GetKey("space") && rb.velocity.y > 0 && moveset > 1)
             return;
         if(coll.wallSide != side)
          anim.Flip(side * -1);
@@ -285,7 +312,11 @@ public class Movement : MonoBehaviour
         if (wallGrab)
             return;
 
-        if (!wallJumped)
+        if (!wallJumped && moveset > 1)
+        {
+            rb.velocity = new Vector2(currentSpeed, rb.velocity.y);
+        }
+        else if(!wallJumped)
         {
             rb.velocity = new Vector2(dir.x * speed, rb.velocity.y);
         }
@@ -297,7 +328,8 @@ public class Movement : MonoBehaviour
 
     private void Jump(Vector2 dir, bool wall)
     {
-        squishAnim.Play("SquashStretch");
+        if(moveset > 1)
+            squishAnim.Play("SquashStretch");
         slideParticle.transform.parent.localScale = new Vector3(ParticleSide(), 1, 1);
         ParticleSystem particle = wall ? wallJumpParticle : jumpParticle;
 
@@ -338,5 +370,47 @@ public class Movement : MonoBehaviour
     {
         int particleSide = coll.onRightWall ? 1 : -1;
         return particleSide;
+    }
+
+    private void updateMoveset(uint newMoveset)
+    {
+        moveset = newMoveset;
+        coll.moveset = newMoveset;
+
+        if (moveset > 2)
+        {
+            playerGrav = 2;
+            dashMomentum = 4;
+        }
+        else
+        {
+            playerGrav = 3;
+            dashMomentum = 14;
+        }
+
+    }
+
+    private void updateSpeed()
+    {
+        
+        currentSpeed += accel * Time.deltaTime * Input.GetAxisRaw("Horizontal");
+        if(Input.GetAxisRaw("Horizontal") != Math.Sign(currentSpeed))
+            currentSpeed += accel * Time.deltaTime * Input.GetAxisRaw("Horizontal");
+
+        //if no input, approach zero
+        if (Input.GetAxisRaw("Horizontal") == 0)
+        {
+            int speedSign = Math.Sign(currentSpeed);
+            currentSpeed -= speedSign * accel * Time.deltaTime;
+            if (speedSign != Math.Sign(currentSpeed))
+                currentSpeed = 0;
+
+        }
+
+        currentSpeed = Mathf.Clamp(currentSpeed, -speed, speed);
+        if (moveset > 1)
+            anim.playerMoveSpeed = currentSpeed;
+        else
+            anim.playerMoveSpeed = Input.GetAxis("Horizontal");
     }
 }

@@ -9,6 +9,8 @@ public class Collision : MonoBehaviour
     [Header("Layers")]
     public LayerMask groundLayer;
 
+    internal uint moveset = 1;
+
     [Space]
 
     public bool onGround;
@@ -17,6 +19,7 @@ public class Collision : MonoBehaviour
     public bool onLeftWall;
     public int wallSide;
     public string mode;
+    public float playerMoveSpeed;
 
     [Space]
 
@@ -42,6 +45,8 @@ public class Collision : MonoBehaviour
         }
 
         //if (mode == "polished") checkCoyote();
+       
+        checkCoyote();
         
 
         onWall = Physics2D.OverlapCircle((Vector2)transform.position + rightOffset, collisionRadius, groundLayer) 
@@ -66,6 +71,11 @@ public class Collision : MonoBehaviour
 
     void checkCoyote()
     {
+        if(moveset == 1)
+        {
+            onGround = Physics2D.OverlapCircle((Vector2)transform.position + bottomOffset, collisionRadius, groundLayer);
+            return;
+        }
 
         if (Physics2D.OverlapCircle((Vector2)transform.position + bottomOffset, collisionRadius, groundLayer))
         {

@@ -8,6 +8,7 @@ public class AnimationScript : MonoBehaviour
     private Animator anim;
     private Movement move;
     private Collision coll;
+    internal float playerMoveSpeed;
     [HideInInspector]
     public SpriteRenderer sr;
 
@@ -28,6 +29,7 @@ public class AnimationScript : MonoBehaviour
         anim.SetBool("wallSlide", move.wallSlide);
         anim.SetBool("canMove", move.canMove);
         anim.SetBool("isDashing", move.isDashing);
+        anim.SetBool("movin", playerMoveSpeed != 0);
 
     }
 

@@ -22,10 +22,12 @@ public class CheatMain : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if (player.GetComponent<Movement>().moveset == 1)
+            return;
         if (bottomTriggered && !topTriggered && !coll.onGround)
         {
             player.transform.Translate(new Vector2(0.01f * movement.side, 0.005f));
-            print("ACK");
+            //print("ACK");
         }
     }
 }
