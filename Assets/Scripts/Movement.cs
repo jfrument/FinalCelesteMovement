@@ -73,11 +73,6 @@ public class Movement : MonoBehaviour
         float yRaw = Input.GetAxisRaw("Vertical");
         Vector2 dir = new Vector2(x, y);
 
-        if (Input.GetKeyDown(KeyCode.E)) {
-            if (mode == "basic") mode = "polished";
-             else if (mode == "polished") mode = "basic";
-        }
-
         updateSpeed();
 
         //walk code
@@ -374,6 +369,9 @@ public class Movement : MonoBehaviour
 
     private void updateMoveset(uint newMoveset)
     {
+         if (mode == "basic") mode = "polished";
+             else if (mode == "polished") mode = "basic";
+
         moveset = newMoveset;
         coll.moveset = newMoveset;
 
