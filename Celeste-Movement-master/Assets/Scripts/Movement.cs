@@ -4,10 +4,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using DG.Tweening;
 
-//beans
 public class Movement : MonoBehaviour
 {
-    public Animator squishAnim;
     private Collision coll;
     [HideInInspector]
     public Rigidbody2D rb;
@@ -16,15 +14,10 @@ public class Movement : MonoBehaviour
     [Space]
     [Header("Stats")]
     public float speed = 10;
-    public float currentSpeed = 0;
-    public float accel = 70;
-
     public float jumpForce = 50;
     public float slideSpeed = 5;
     public float wallJumpLerp = 10;
     public float dashSpeed = 20;
-    public float dashMomentum = 14;
-    public float playerGrav = 3;
 
     [Space]
     [Header("Booleans")]
@@ -33,6 +26,10 @@ public class Movement : MonoBehaviour
     public bool wallJumped;
     public bool wallSlide;
     public bool isDashing;
+    public bool walkFlag = false;
+    public int modeSwitch = 1;
+
+    public bool jumpDelay = false;
 
     [Space]
 
@@ -40,8 +37,6 @@ public class Movement : MonoBehaviour
     private bool hasDashed;
 
     public int side = 1;
-    public String mode = "basic";
-    internal uint moveset = 1;
 
     [Space]
     [Header("Polish")]
@@ -50,11 +45,7 @@ public class Movement : MonoBehaviour
     public ParticleSystem wallJumpParticle;
     public ParticleSystem slideParticle;
 
-    [Space]
-    [Header("Audio")]
-    public AudioSource jumpSound;
-    public AudioSource dashSound;
-
+    float walkModifier;
 
     // Start is called before the first frame update
     void Start()
@@ -62,64 +53,82 @@ public class Movement : MonoBehaviour
         coll = GetComponent<Collision>();
         rb = GetComponent<Rigidbody2D>();
         anim = GetComponentInChildren<AnimationScript>();
+        walkModifier = 1f;
     }
 
     // Update is called once per frame
     void Update()
     {
-        float x = Input.GetAxis("Horizontal");
-        float y = Input.GetAxis("Vertical");
+        if (Input.GetKeyDown(KeyCode.P)) {
+            modeSwitch *= -1;
+        }
+
+        float x = Input.GetAxisRaw("Horizontal");
+        float y = Input.GetAxisRaw("Vertical");
         float xRaw = Input.GetAxisRaw("Horizontal");
         float yRaw = Input.GetAxisRaw("Vertical");
-        Vector2 dir = new Vector2(x, y);
 
-        if (Input.GetKeyDown(KeyCode.E)) {
-            if (mode == "basic") mode = "polished";
-             else if (mode == "polished") mode = "basic";
+        float xCopy = x;
+
+        if (Input.GetKeyDown(KeyCode.A) || Input.GetKeyDown(KeyCode.D)) {
+            StartCoroutine(slowWalk());
         }
 
-        updateSpeed();
+        IEnumerator slowWalk() {  
+            Debug.Log("Should have started slowWalk"); 
+            walkModifier = 0.75f;
+            yield return new WaitForSeconds(.2f);
+                walkModifier = 1f;
+        }
 
-        //walk code
+        //Debug.Log(walkModifier);
+        Vector2 dir = new Vector2(x*walkModifier, y*walkModifier);
+        //Debug.Log(x.ToString()+" regular x"+xRaw.ToString());
+
         Walk(dir);
         anim.SetHorizontalMovement(x, y, rb.velocity.y);
+        if ((Input.GetKeyDown(KeyCode.LeftArrow) || Input.GetKeyDown(KeyCode.RightArrow))) {
+            walkFlag = true;
+            /*if (Input.GetKeyDown(KeyCode.LeftArrow)) {
+                rb.velocity.x += 
+            }*/
+            //rb.velocity = new Vector2(rb.velocity.x+100, rb.velocity.y);
+        }
+        /*if (!Input.GetKeyDown(KeyCode.LeftArrow) && !Input.GetKeyDown(KeyCode.RightArrow)) {
+            walkFlag = false;
+        }*/
 
-        //wallgrab code
         if (coll.onWall && Input.GetButton("Fire3") && canMove)
         {
+            Debug.Log("Fire3 pressed");
             if(side != coll.wallSide)
                 anim.Flip(side*-1);
-            wallGrab = true;
+            wallGrab = true; 
             wallSlide = false;
         }
+        //print(wallGrab);
 
-        //wallgrab code
+
+        //if (wallGrab) Debug.Log("true");
+        //else Debug.Log("false");
+        //Debug.Log("78 SIDJFOIJSDF");
+
         if (Input.GetButtonUp("Fire3") || !coll.onWall || !canMove)
         {
             wallGrab = false;
             wallSlide = false;
         }
 
-        if (Input.GetKeyDown("1"))
-            updateMoveset(1);
-        if (Input.GetKeyDown("2"))
-            updateMoveset(2);
-        if (Input.GetKeyDown("3"))
-            updateMoveset(3);
-
-        if(Input.GetKeyDown("r"))
-            rb.transform.position = new Vector2(-9, -3);
-
-        //resetting wall jumps
         if (coll.onGround && !isDashing)
         {
             wallJumped = false;
             GetComponent<BetterJumping>().enabled = true;
         }
+
         
-        //wallgrab code
-        if (wallGrab && !isDashing)
+        if (wallGrab && !isDashing && !jumpDelay)
         {
+            //Debug.Log("94wallgrabbing");
             rb.gravityScale = 0;
             if(x > .2f || x < -.2f)
             rb.velocity = new Vector2(rb.velocity.x, 0);
@@ -129,60 +138,65 @@ public class Movement : MonoBehaviour
             rb.velocity = new Vector2(rb.velocity.x, y * (speed * speedModifier));
         }
         else
-            rb.gravityScale = playerGrav;
+        {
+            rb.gravityScale = 3;
+        }
 
-        //wallgrab code
         if(coll.onWall && !coll.onGround)
         {
-            if (x != 0 && !wallGrab)
+            if (x != 0 && !wallGrab && !jumpDelay)
             {
                 wallSlide = true;
                 WallSlide();
             }
         }
+        //Debug.Log(jumpDelay);
 
-        //reset wallgrab code
         if (!coll.onWall || coll.onGround)
             wallSlide = false;
 
-
-        //jump code
         if (Input.GetButtonDown("Jump"))
         {
-            if(moveset > 1 && coll.onGround || moveset > 1 && coll.onWall)
-                jumpSound.Play();
             anim.SetTrigger("jump");
 
-            if (coll.onGround)
+            if (coll.onGround) {
                 Jump(Vector2.up, false);
+                if (modeSwitch == -1) StartCoroutine(jumpWait(0.4f));
+            }
             if (coll.onWall && !coll.onGround)
                 WallJump();
         }
 
-        //dash code
-        if (mode == "polished") {
+        
+        IEnumerator jumpWait(float interval) {
+            jumpDelay = true;
+            yield return new WaitForSeconds(interval);
+            jumpDelay = false;
+        }
+        if (modeSwitch == -1) {
             if ((Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.RightArrow) || Input.GetKeyDown(KeyCode.LeftArrow) || Input.GetKeyDown(KeyCode.DownArrow))&& !hasDashed)
             {
+                //Debug.Log("Fire1 pressed");
+                //if(xRaw != 0 || yRaw != 0)
+                    //Dash(xRaw, yRaw);
                 if (Input.GetKeyDown(KeyCode.LeftArrow)) Dash(-1, 0);
                 else if (Input.GetKeyDown(KeyCode.RightArrow)) Dash(1, 0);
                 else if (Input.GetKeyDown(KeyCode.UpArrow)) Dash(0, 1);
                 else if (Input.GetKeyDown(KeyCode.DownArrow)) Dash(0, -1);
             }
-        } else if (mode == "basic") {
+        } else {
             if (Input.GetButtonDown("Fire1") && !hasDashed) {
-                    if(xRaw != 0 || yRaw != 0)
-                        Dash(xRaw, yRaw);
-                }
+                if(xRaw != 0 || yRaw != 0)
+                    Dash(xRaw, yRaw);
+            }
         }
 
-        //landing code
         if (coll.onGround && !groundTouch)
         {
             GroundTouch();
             groundTouch = true;
         }
 
-        //jump code
         if(!coll.onGround && groundTouch)
         {
             groundTouch = false;
@@ -190,11 +204,9 @@ public class Movement : MonoBehaviour
 
         WallParticle(y);
 
-        //hardcoded solution to a bug
-        if (wallGrab || wallSlide)
+        if (wallGrab || wallSlide || !canMove)
             return;
 
-        //direction facing code
         if(x > 0)
         {
             side = 1;
@@ -207,7 +219,7 @@ public class Movement : MonoBehaviour
         }
 
 
-    }//end of update
+    }
 
     void GroundTouch()
     {
@@ -223,11 +235,10 @@ public class Movement : MonoBehaviour
     {
         Camera.main.transform.DOComplete();
         Camera.main.transform.DOShakePosition(.2f, .5f, 14, 90, false, true);
+        FindObjectOfType<RippleEffect>().Emit(Camera.main.WorldToViewportPoint(transform.position));
 
         hasDashed = true;
 
-        if(moveset > 1)
-            dashSound.Play();
         anim.SetTrigger("dash");
 
         rb.velocity = Vector2.zero;
@@ -241,8 +252,7 @@ public class Movement : MonoBehaviour
     {
         FindObjectOfType<GhostTrail>().ShowGhost();
         StartCoroutine(GroundDash());
-        if (mode == "basic") DOVirtual.Float(14, 0, .8f, RigidbodyDrag);
-        else if (mode == "polished") DOVirtual.Float(14, 0, .8f, RigidbodyDrag);
+        DOVirtual.Float(7, 0, .8f, RigidbodyDrag);
 
         dashParticle.Play();
         rb.gravityScale = 0;
@@ -253,7 +263,7 @@ public class Movement : MonoBehaviour
         yield return new WaitForSeconds(.3f);
 
         dashParticle.Stop();
-        rb.gravityScale = playerGrav;
+        rb.gravityScale = 3;
         GetComponent<BetterJumping>().enabled = true;
         wallJumped = false;
         isDashing = false;
@@ -286,8 +296,6 @@ public class Movement : MonoBehaviour
 
     private void WallSlide()
     {
-        if (Input.GetKey("space") && rb.velocity.y > 0 && moveset > 1)
-            return;
         if(coll.wallSide != side)
          anim.Flip(side * -1);
 
@@ -301,7 +309,7 @@ public class Movement : MonoBehaviour
         }
         float push = pushingWall ? 0 : rb.velocity.x;
 
-        rb.velocity = new Vector2(push, -slideSpeed);
+        rb.velocity = new Vector2(push, -slideSpeed*1);
     }
 
     private void Walk(Vector2 dir)
@@ -312,13 +320,11 @@ public class Movement : MonoBehaviour
         if (wallGrab)
             return;
 
-        if (!wallJumped && moveset > 1)
+        if (!wallJumped)
         {
-            rb.velocity = new Vector2(currentSpeed, rb.velocity.y);
-        }
-        else if(!wallJumped)
-        {
-            rb.velocity = new Vector2(dir.x * speed, rb.velocity.y);
+            
+            if (modeSwitch == -1) rb.velocity = new Vector2(dir.x * speed*1.3f, rb.velocity.y);
+            else rb.velocity = new Vector2(dir.x * speed, rb.velocity.y);
         }
         else
         {
@@ -328,8 +334,6 @@ public class Movement : MonoBehaviour
 
     private void Jump(Vector2 dir, bool wall)
     {
-        if(moveset > 1)
-            squishAnim.Play("SquashStretch");
         slideParticle.transform.parent.localScale = new Vector3(ParticleSide(), 1, 1);
         ParticleSystem particle = wall ? wallJumpParticle : jumpParticle;
 
@@ -370,47 +374,5 @@ public class Movement : MonoBehaviour
     {
         int particleSide = coll.onRightWall ? 1 : -1;
         return particleSide;
-    }
-
-    private void updateMoveset(uint newMoveset)
-    {
-        moveset = newMoveset;
-        coll.moveset = newMoveset;
-
-        if (moveset > 2)
-        {
-            playerGrav = 2;
-            dashMomentum = 4;
-        }
-        else
-        {
-            playerGrav = 3;
-            dashMomentum = 14;
-        }
-
-    }
-
-    private void updateSpeed()
-    {
-        
-        currentSpeed += accel * Time.deltaTime * Input.GetAxisRaw("Horizontal");
-        if(Input.GetAxisRaw("Horizontal") != Math.Sign(currentSpeed))
-            currentSpeed += accel * Time.deltaTime * Input.GetAxisRaw("Horizontal");
-
-        //if no input, approach zero
-        if (Input.GetAxisRaw("Horizontal") == 0)
-        {
-            int speedSign = Math.Sign(currentSpeed);
-            currentSpeed -= speedSign * accel * Time.deltaTime;
-            if (speedSign != Math.Sign(currentSpeed))
-                currentSpeed = 0;
-
-        }
-
-        currentSpeed = Mathf.Clamp(currentSpeed, -speed, speed);
-        if (moveset > 1)
-            anim.playerMoveSpeed = currentSpeed;
-        else
-            anim.playerMoveSpeed = Input.GetAxis("Horizontal");
     }
 }

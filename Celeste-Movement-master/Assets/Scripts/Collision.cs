@@ -1,15 +1,12 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-//using String;
 
 public class Collision : MonoBehaviour
 {
-    internal float coyoteTime = .1f;
+
     [Header("Layers")]
     public LayerMask groundLayer;
-
-    internal uint moveset = 1;
 
     [Space]
 
@@ -18,8 +15,6 @@ public class Collision : MonoBehaviour
     public bool onRightWall;
     public bool onLeftWall;
     public int wallSide;
-    public string mode;
-    public float playerMoveSpeed;
 
     [Space]
 
@@ -32,23 +27,13 @@ public class Collision : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        //mode = "basic";
         
     }
 
     // Update is called once per frame
     void Update()
-    {
-        if (Input.GetKeyDown(KeyCode.E)) {
-            //if (mode == "basic") mode = "polished";
-            //else if (mode == "polished") mode = "basic";
-        }
-
-        //if (mode == "polished") checkCoyote();
-       
-        checkCoyote();
-        
-
+    {  
+        onGround = Physics2D.OverlapCircle((Vector2)transform.position + bottomOffset, collisionRadius, groundLayer);
         onWall = Physics2D.OverlapCircle((Vector2)transform.position + rightOffset, collisionRadius, groundLayer) 
             || Physics2D.OverlapCircle((Vector2)transform.position + leftOffset, collisionRadius, groundLayer);
 
@@ -67,28 +52,5 @@ public class Collision : MonoBehaviour
         Gizmos.DrawWireSphere((Vector2)transform.position  + bottomOffset, collisionRadius);
         Gizmos.DrawWireSphere((Vector2)transform.position + rightOffset, collisionRadius);
         Gizmos.DrawWireSphere((Vector2)transform.position + leftOffset, collisionRadius);
-    }
-
-    void checkCoyote()
-    {
-        if(moveset == 1)
-        {
-            onGround = Physics2D.OverlapCircle((Vector2)transform.position + bottomOffset, collisionRadius, groundLayer);
-            return;
-        }
-
-        if (Physics2D.OverlapCircle((Vector2)transform.position + bottomOffset, collisionRadius, groundLayer))
-        {
-            onGround = true;
-            
-        }
-        else
-            StartCoroutine(coyote(coyoteTime));
-    }
-
-    IEnumerator coyote(float x)
-    {
-        yield return new WaitForSeconds(x);
-        onGround = true;
     }
 }
