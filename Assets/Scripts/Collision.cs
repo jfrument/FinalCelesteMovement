@@ -39,12 +39,7 @@ public class Collision : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.E)) {
-            //if (mode == "basic") mode = "polished";
-            //else if (mode == "polished") mode = "basic";
-        }
-
-        //if (mode == "polished") checkCoyote();
+        
        
         checkCoyote();
         
@@ -89,6 +84,6 @@ public class Collision : MonoBehaviour
     IEnumerator coyote(float x)
     {
         yield return new WaitForSeconds(x);
-        onGround = false;
+        onGround = Physics2D.OverlapCircle((Vector2)transform.position + bottomOffset, collisionRadius, groundLayer);
     }
 }

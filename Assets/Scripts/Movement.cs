@@ -155,6 +155,7 @@ public class Movement : MonoBehaviour
 
             if (coll.onGround)
                 Jump(Vector2.up, false);
+             
             if (coll.onWall && !coll.onGround)
                 WallJump();
         }
