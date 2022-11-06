@@ -38,6 +38,9 @@ TagManager:
   - 
   - 
   m_SortingLayers:
+  - name: Parallax Planets
+    uniqueID: 1170142445
+    locked: 0
   - name: Default
     uniqueID: 0
     locked: 0
